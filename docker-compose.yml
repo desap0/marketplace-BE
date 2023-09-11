@@ -1,0 +1,68 @@
+version: '3.7'
+
+services:
+  marketplace_db:
+    container_name: marketplace_db_container
+    environment:
+      - POSTGRES_HOST=${DB_HOST}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    image: postgres:14
+    restart: always
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    networks:
+      - default
+
+  marketplace_api:
+    container_name: marketplace_api 
+    build:
+      context: .                      
+    volumes:                        
+      - .:/app                         
+      - /app/node_modules              
+    ports:                             
+      - 3000:3000
+    command: npm run start:dev
+    depends_on:
+      - migration
+    restart: always
+
+  pgAdmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - '7777:80'
+    networks:
+      - default    
+
+  migration:                                   
+    container_name: migration               
+    user: root                                 
+    build:                                     
+      context: .                               
+    environment:
+      - POSTGRES_HOST=${DB_HOST}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run container:migration:up
+    depends_on:
+      - marketplace_db
+    networks:
+      - default
+
+volumes:
+  db_volume:
+    name: db_volume
+
+networks:
+  default:
+    name: app_network
