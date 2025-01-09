@@ -9,25 +9,27 @@ services:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     image: postgres:14
+    ports:                             
+      - ${DB_PORT}:${DB_PORT}
     restart: always
     volumes:
       - db_volume:/var/lib/postgresql/data
     networks:
       - default
 
-  marketplace_api:
-    container_name: marketplace_api 
-    build:
-      context: .                      
-    volumes:                        
-      - .:/app                         
-      - /app/node_modules              
-    ports:                             
-      - 3000:3000
-    command: npm run start:dev
-    depends_on:
-      - migration
-    restart: always
+  # marketplace_api:
+  #   container_name: marketplace_api 
+  #   build:
+  #     context: .                      
+  #   volumes:                        
+  #     - .:/app                         
+  #     - /app/node_modules              
+  #   ports:                             
+  #     - 3000:3000
+  #   command: npm run start:dev
+  #   depends_on:
+  #     - migration
+  #   restart: always
 
   pgAdmin:
     container_name: pgadmin4
