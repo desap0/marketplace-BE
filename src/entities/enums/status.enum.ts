@@ -1,0 +1,7 @@
+export enum Status {
+  DONE = 'DONE',
+  PROBLEM = 'PROBLEM',
+  CANCELED = 'CANCELED',
+  PROGRESS = 'PROGRESS',
+  NOT_STARTED = 'NOT STARTED',
+}
